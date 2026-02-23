@@ -3,98 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Security Awareness Simulation</title>
+<title>Security Awareness Demo</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #121212;
+    background: #111;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    text-align: center;
+}
+
+.box {
+    background: #222;
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 0 25px rgba(255,0,0,0.6);
+}
+
+h2 {
+    color: #ff4d4d;
 }
 
 button {
-    padding: 12px 20px;
-    font-size: 16px;
+    margin-top: 15px;
+    padding: 10px 15px;
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
+    background: #007bff;
+    color: white;
     cursor: pointer;
-    background-color: #ff4d4d;
-    color: white;
-}
-
-.popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
-
-.popup {
-    background: white;
-    color: black;
-    padding: 25px;
-    width: 350px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 0 20px red;
-    animation: shake 0.3s ease-in-out 2;
-}
-
-.popup h2 {
-    color: red;
-    margin-bottom: 10px;
-}
-
-.popup p {
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-.close-btn {
-    background-color: #007bff;
-    color: white;
-}
-
-@keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
 }
 </style>
 </head>
-
 <body>
 
-<button onclick="showPopup()">Click Here</button>
-
-<div class="popup-overlay" id="overlay">
-    <div class="popup">
-        <h2>⚠ Suspicious Activity Detected</h2>
-        <p>This is a cybersecurity awareness simulation.</p>
-        <p>Real malicious popups often try to scare you into clicking quickly.</p>
-        <button class="close-btn" onclick="closePopup()">I Understand</button>
-    </div>
+<div class="box">
+    <h2>⚠ You Clicked a Suspicious Link</h2>
+    <p id="message">Simulating what a malicious site might attempt...</p>
+    <button onclick="resetDemo()">Reset Demo</button>
 </div>
 
 <script>
-function showPopup() {
-    document.getElementById("overlay").style.display = "flex";
-}
+window.onload = function() {
+    const message = document.getElementById("message");
 
-function closePopup() {
-    document.getElementById("overlay").style.display = "none";
+    setTimeout(() => {
+        message.innerHTML = "🔍 Attempting to access browser data...";
+    }, 1500);
+
+    setTimeout(() => {
+        message.innerHTML = "📡 Attempting to send data to remote server...";
+    }, 3000);
+
+    setTimeout(() => {
+        message.innerHTML = "🔄 Attempting forced redirect...";
+    }, 4500);
+
+    setTimeout(() => {
+        message.innerHTML = "✅ This was a SAFE cybersecurity awareness simulation.<br><br>JavaScript can run automatically when visiting a website. Always verify links before clicking.";
+    }, 6000);
+};
+
+function resetDemo() {
+    location.reload();
 }
 </script>
 
